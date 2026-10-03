@@ -1,0 +1,261 @@
+table Fact_Sales
+	lineageTag: 0d4d61ba-caca-4174-a7ae-900bf388acb6
+
+	measure 'Total Sales' = SUM(Fact_Sales[Calculated Total])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 51a0e39c-f52c-4199-b59e-6198e1153306
+
+	measure 'Units Sold' = sum(Fact_Sales[Quantity])
+		formatString: 0
+		lineageTag: 8fb6a3ed-e479-4d5c-9842-3875150cfa3b
+
+	measure 'Total Transactions' = DISTINCTCOUNT(Fact_Sales[Transaction ID])
+		formatString: 0
+		lineageTag: 554e72ae-165c-41a8-9684-c277a10d4dea
+
+	measure 'Average Transaction Value' = DIVIDE([Total Sales], [Total Transactions])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 228470ee-2d11-477b-9a73-daca4ca944ff
+
+	measure 'Average Unit Price' = AVERAGE(Fact_Sales[Price Per Unit Final])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: c34fac65-23d0-433f-be7a-dbdd851ef15f
+
+	measure 'Discounted Transactions' = CALCULATE([Total Transactions], Fact_Sales[Discount_Applied_Clean]= "true")
+		formatString: 0
+		lineageTag: cf625a1c-03d2-4867-9eff-d4d9c5ce0b5b
+
+	measure 'Discount Rate' = ```
+			
+			DIVIDE(
+			    [Discounted Transactions],
+			    [Total Transactions]
+			)
+			
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 7ae9289a-1b82-453d-9a37-e1e0ed193c0f
+
+	measure 'Market Analysis' = "Sales Performance Dashboard- " & COALESCE(SELECTEDVALUE(Dim_Category[Category]), "All Categories") & " | " & COALESCE(SELECTEDVALUE(Dim_Location[Location]), "All Locations") & " | " & COALESCE(SELECTEDVALUE(Dim_Payment_Method[Payment Method]), "All Payment Methods")
+		lineageTag: 2416d8d5-1ae2-4e9a-aed5-57a11122f1e9
+
+	measure 'Previous Year Sales' =
+			
+			CALCULATE(
+			    [Total Sales],
+			    SAMEPERIODLASTYEAR(Dim_Date[Date]
+			))
+		lineageTag: a2add950-631b-4c4f-9460-c5087dd698a0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'YoY Sales Growth %' =
+			
+			DIVIDE(
+			    [Total Sales] - [Previous Year Sales],
+			    [Previous Year Sales]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 5846a9dd-6fab-42fd-af28-ad6fa23b4854
+
+	measure 'Previous Month Sales' = CALCULATE([Total Sales], DATEADD(Dim_Date[Date],-1,MONTH))
+		lineageTag: 927de0fe-19f9-4661-9e06-4848e2f22fc7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'MoM Sales Growth %' =
+			
+			DIVIDE(
+			    [Total Sales] - [Previous Month Sales],
+			    [Previous Month Sales]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 25e9c8fb-7c6c-488b-9f55-db395a83f3ea
+
+	measure 'Customer Details Title' =
+			
+			"Customer Details | " &
+			SELECTEDVALUE(
+			    Dim_Customer[Customer ID],
+			    "All Customers"
+			)
+		lineageTag: d5c44f0b-b84d-4616-b0e6-a202fcb02b1c
+
+	measure 'Product Details Title' = "Product Details" & " | " & COALESCE(SELECTEDVALUE(Dim_Product[Item]),"All Products")
+		lineageTag: 00989049-eb11-4e97-aceb-af0217974044
+
+	column 'Transaction ID'
+		dataType: string
+		lineageTag: 67d62f32-98d2-4381-b8e6-cbbc585b820e
+		summarizeBy: none
+		sourceColumn: Transaction ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 756b016c-f478-4ddc-a3d2-d6015742e741
+		summarizeBy: none
+		sourceColumn: Customer_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 4b423264-c9e9-4b0d-b2ee-212838f49ec8
+		summarizeBy: none
+		sourceColumn: Category_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: fc0e345d-5f7f-4773-8073-2a64022d84f3
+		summarizeBy: none
+		sourceColumn: Product_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 18116dbf-8c4d-467a-9398-69bd28dd373b
+		summarizeBy: none
+		sourceColumn: Location_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Payment_Method_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 4c37808d-4540-407d-a4a6-6010d3623863
+		summarizeBy: none
+		sourceColumn: Payment_Method_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 0acb1c5e-30d1-4769-9413-61bda5dde2d7
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Discount_Applied_Clean
+		dataType: string
+		lineageTag: ea63fea4-af55-47bb-aeb6-29ff9698219f
+		summarizeBy: none
+		sourceColumn: Discount_Applied_Clean
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Price Per Unit Final'
+		dataType: double
+		lineageTag: 5bd9a6cf-5dfd-49b3-b7c0-2de90722528b
+		summarizeBy: sum
+		sourceColumn: Price Per Unit Final
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: f8e24eae-5ff6-44c3-93b0-2452cb4a8451
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calculated Total'
+		dataType: double
+		lineageTag: 510d19bc-0e32-4e10-a7ce-c219577e16b3
+		summarizeBy: sum
+		sourceColumn: Calculated Total
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Fact_Sales = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\ASUS\Downloads\retail_store_sales.csv"), [Delimiter = ",", Columns = 11, Encoding = 65001]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"Transaction ID", type text}, {"Customer ID", type text}, {"Category", type text}, {"Item", type text}, {"Price Per Unit", type number}, {"Quantity", Int64.Type}, {"Total Spent", type number}, {"Payment Method", type text}, {"Location", type text}, {"Transaction Date", type date}, {"Discount Applied", type logical}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed column type", "Calculated_Price", each [Total Spent]/[Quantity]),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Added Custom",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Calculated_Price", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Reordered Columns",{"Calculated_Price"}),
+				    #"Added Custom1" = Table.AddColumn(#"Removed Columns", "Price Per Unit Clean", each if [Price Per Unit] = null
+				then [Total Spent] / [Quantity]
+				else [Price Per Unit]),
+				    #"Reordered Columns1" = Table.ReorderColumns(#"Added Custom1",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied"}),
+				    #"Added Custom2" = Table.AddColumn(#"Reordered Columns1", "Calculated Total", each [Price Per Unit Clean] * [Quantity]),
+				    #"Reordered Columns2" = Table.ReorderColumns(#"Added Custom2",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied", "Calculated Total"}),
+				    #"Added Custom3" = Table.AddColumn(#"Reordered Columns2", "Total Difference", each [Total Spent] - [Calculated Total]),
+				    #"Reordered Columns3" = Table.ReorderColumns(#"Added Custom3",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Total Difference", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied", "Calculated Total"}),
+				    #"Reordered Columns4" = Table.ReorderColumns(#"Reordered Columns3",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Total Difference", "Discount Applied", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Calculated Total"}),
+				    #"Added Custom4" = Table.AddColumn(#"Reordered Columns4", "Total Check", each if [Total Spent] = [Calculated Total] then "Match"
+				else if [Total Spent] = null and [Calculated Total] = null then "Both Null"
+				else if [Total Spent] = null then "Total Spent Missing"
+				else if [Calculated Total] = null then "Calculated Total Missing"
+				else "Mismatch"),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom4",{"Total Check"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Columns1", each true),
+				    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows",{{"Price Per Unit Clean", "Price Per Unit Final"}}),
+				    #"Reordered Columns5" = Table.ReorderColumns(#"Renamed Columns",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Total Difference", "Discount Applied", "Price Per Unit Final", "Quantity", "Calculated Total", "Total Spent", "Payment Method", "Location", "Transaction Date"}),
+				    #"Added Custom5" = Table.AddColumn(#"Reordered Columns5", "Item_Final", each if[Item] = "" then "Unknown"
+				else [Item]),
+				    #"Reordered Columns6" = Table.ReorderColumns(#"Added Custom5",{"Transaction ID", "Customer ID", "Category", "Item", "Item_Final", "Price Per Unit", "Total Difference", "Discount Applied", "Price Per Unit Final", "Quantity", "Calculated Total", "Total Spent", "Payment Method", "Location", "Transaction Date"}),
+				    #"Added Custom6" = Table.AddColumn(#"Reordered Columns6", "Discount_Applied_Clean", each if [Discount Applied] is null then "Unknown"
+				else [Discount Applied]),
+				    #"Reordered Columns7" = Table.ReorderColumns(#"Added Custom6",{"Transaction ID", "Customer ID", "Category", "Item", "Item_Final", "Price Per Unit", "Total Difference", "Discount_Applied_Clean", "Discount Applied", "Price Per Unit Final", "Quantity", "Calculated Total", "Total Spent", "Payment Method", "Location", "Transaction Date"}),
+				    #"Removed Columns2" = Table.RemoveColumns(#"Reordered Columns7",{"Item", "Price Per Unit", "Total Difference", "Discount Applied", "Total Spent"}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Removed Columns2",{{"Category", Text.Trim, type text}, {"Item_Final", Text.Trim, type text}}),
+				    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Category", Text.Clean, type text}, {"Item_Final", Text.Clean, type text}}),
+				    #"Capitalized Each Word" = Table.TransformColumns(#"Cleaned Text",{{"Category", Text.Proper, type text}, {"Item_Final", Text.Proper, type text}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Capitalized Each Word", {"Item_Final"}, Dim_Product, {"Item"}, "Dim_Product", JoinKind.LeftOuter),
+				    #"Expanded Dim_Product" = Table.ExpandTableColumn(#"Merged Queries", "Dim_Product", {"Product_Key"}, {"Dim_Product.Product_Key"}),
+				    #"Reordered Columns8" = Table.ReorderColumns(#"Expanded Dim_Product",{"Transaction ID", "Customer ID", "Category", "Dim_Product.Product_Key", "Item_Final", "Discount_Applied_Clean", "Price Per Unit Final", "Quantity", "Calculated Total", "Payment Method", "Location", "Transaction Date"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Reordered Columns8",{{"Dim_Product.Product_Key", "Product_Key"}, {"Item_Final", "Item"}}),
+				    #"Merged Queries1" = Table.NestedJoin(#"Renamed Columns1", {"Category"}, Dim_Category, {"Category"}, "Dim_Category", JoinKind.LeftOuter),
+				    #"Expanded Dim_Category" = Table.ExpandTableColumn(#"Merged Queries1", "Dim_Category", {"Category_Key"}, {"Dim_Category.Category_Key"}),
+				    #"Reordered Columns9" = Table.ReorderColumns(#"Expanded Dim_Category",{"Transaction ID", "Customer ID", "Dim_Category.Category_Key", "Category", "Product_Key", "Item", "Discount_Applied_Clean", "Price Per Unit Final", "Quantity", "Calculated Total", "Payment Method", "Location", "Transaction Date"}),
+				    #"Renamed Columns2" = Table.RenameColumns(#"Reordered Columns9",{{"Dim_Category.Category_Key", "Category_Key"}}),
+				    #"Trimmed Text1" = Table.TransformColumns(#"Renamed Columns2",{{"Payment Method", Text.Trim, type text}}),
+				    #"Cleaned Text1" = Table.TransformColumns(#"Trimmed Text1",{{"Payment Method", Text.Clean, type text}}),
+				    #"Capitalized Each Word1" = Table.TransformColumns(#"Cleaned Text1",{{"Payment Method", Text.Proper, type text}}),
+				    #"Merged Queries2" = Table.NestedJoin(#"Capitalized Each Word1", {"Payment Method"}, Dim_Payment_Method, {"Payment Method"}, "Dim_Payment_Method", JoinKind.LeftOuter),
+				    #"Expanded Dim_Payment_Method" = Table.ExpandTableColumn(#"Merged Queries2", "Dim_Payment_Method", {"Payment_Method_Key"}, {"Dim_Payment_Method.Payment_Method_Key"}),
+				    #"Renamed Columns3" = Table.RenameColumns(#"Expanded Dim_Payment_Method",{{"Dim_Payment_Method.Payment_Method_Key", "Payment_Method_Key"}}),
+				    #"Reordered Columns10" = Table.ReorderColumns(#"Renamed Columns3",{"Transaction ID", "Customer ID", "Category_Key", "Category", "Product_Key", "Item", "Discount_Applied_Clean", "Price Per Unit Final", "Quantity", "Calculated Total", "Payment_Method_Key", "Payment Method", "Location", "Transaction Date"}),
+				    #"Merged Queries3" = Table.NestedJoin(#"Reordered Columns10", {"Location"}, Dim_Location, {"Location"}, "Dim_Location", JoinKind.LeftOuter),
+				    #"Expanded Dim_Location" = Table.ExpandTableColumn(#"Merged Queries3", "Dim_Location", {"Location_Key"}, {"Dim_Location.Location_Key"}),
+				    #"Renamed Columns4" = Table.RenameColumns(#"Expanded Dim_Location",{{"Dim_Location.Location_Key", "Location_Key"}}),
+				    #"Reordered Columns11" = Table.ReorderColumns(#"Renamed Columns4",{"Transaction ID", "Customer ID", "Category_Key", "Category", "Product_Key", "Item", "Discount_Applied_Clean", "Price Per Unit Final", "Quantity", "Calculated Total", "Payment_Method_Key", "Payment Method", "Location_Key", "Location", "Transaction Date"}),
+				    #"Removed Columns3" = Table.RemoveColumns(#"Reordered Columns11",{"Category", "Item"}),
+				    #"Merged Queries4" = Table.NestedJoin(#"Removed Columns3", {"Customer ID"}, Dim_Customer, {"Customer ID"}, "Dim_Customer", JoinKind.LeftOuter),
+				    #"Expanded Dim_Customer" = Table.ExpandTableColumn(#"Merged Queries4", "Dim_Customer", {"Customer_Key"}, {"Dim_Customer.Customer_Key"}),
+				    #"Reordered Columns12" = Table.ReorderColumns(#"Expanded Dim_Customer",{"Transaction ID", "Dim_Customer.Customer_Key", "Customer ID", "Category_Key", "Product_Key", "Discount_Applied_Clean", "Price Per Unit Final", "Quantity", "Calculated Total", "Payment_Method_Key", "Payment Method", "Location_Key", "Location", "Transaction Date"}),
+				    #"Renamed Columns5" = Table.RenameColumns(#"Reordered Columns12",{{"Dim_Customer.Customer_Key", "Customer_Key"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns5",{{"Transaction Date", type date}}),
+				    #"Merged Queries5" = Table.NestedJoin(#"Changed Type", {"Transaction Date"}, Dim_Date, {"Date"}, "Dim_Date", JoinKind.LeftOuter),
+				    #"Expanded Dim_Date" = Table.ExpandTableColumn(#"Merged Queries5", "Dim_Date", {"Date_Key"}, {"Dim_Date.Date_Key"}),
+				    #"Renamed Columns6" = Table.RenameColumns(#"Expanded Dim_Date",{{"Dim_Date.Date_Key", "Date_Key"}}),
+				    #"Reordered Columns13" = Table.ReorderColumns(#"Renamed Columns6",{"Transaction ID", "Customer ID", "Customer_Key", "Category_Key", "Product_Key", "Location_Key", "Payment_Method_Key", "Date_Key", "Transaction Date", "Discount_Applied_Clean", "Price Per Unit Final", "Payment Method", "Quantity", "Location", "Calculated Total"}),
+				    #"Removed Columns4" = Table.RemoveColumns(#"Reordered Columns13",{"Customer ID", "Transaction Date", "Location", "Payment Method"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns4",{{"Price Per Unit Final", type number}, {"Calculated Total", type number}, {"Discount_Applied_Clean", type text}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

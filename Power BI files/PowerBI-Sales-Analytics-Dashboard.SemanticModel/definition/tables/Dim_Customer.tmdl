@@ -1,0 +1,37 @@
+table Dim_Customer
+	lineageTag: d2f705a3-82b6-4d50-a985-7e7727e08499
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: 7b11cc96-54ba-4b9a-8cdf-4564899a5ec1
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: aad13cd6-2b93-47e8-a4a0-e50c976b2245
+		summarizeBy: none
+		sourceColumn: Customer_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Customer = m
+		mode: import
+		source =
+				let
+				    Source = retail_store_sales,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"Customer ID"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Sorted Rows" = Table.Sort(#"Removed Duplicates",{{"Customer ID", Order.Ascending}}),
+				    #"Added Index" = Table.AddIndexColumn(#"Sorted Rows", "Index", 1, 1, Int64.Type),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Index",{{"Index", "Customer_Key"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

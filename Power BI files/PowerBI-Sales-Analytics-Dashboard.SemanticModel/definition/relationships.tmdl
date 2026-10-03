@@ -1,0 +1,29 @@
+relationship 46cb5567-19b3-49be-912b-8ce36ddcee71
+	joinOnDateBehavior: datePartOnly
+	fromColumn: retail_store_sales.'Transaction Date'
+	toColumn: LocalDateTable_2022d74c-c539-46a9-b51e-faf22e81395e.Date
+
+relationship fad9a61f-0aa3-f03f-4c81-62bc741901c2
+	fromColumn: Fact_Sales.Category_Key
+	toColumn: Dim_Category.Category_Key
+
+relationship 5ed5f357-26bf-fa97-ab4e-91fc5b4121c4
+	fromColumn: Fact_Sales.Customer_Key
+	toColumn: Dim_Customer.Customer_Key
+
+relationship 02f28f32-c24d-931b-8d65-1f97bcb6dbd3
+	fromColumn: Fact_Sales.Date_Key
+	toColumn: Dim_Date.Date_Key
+
+relationship 0fccdb83-7944-4f18-abb1-7af422c90d26
+	fromColumn: Fact_Sales.Location_Key
+	toColumn: Dim_Location.Location_Key
+
+relationship 03e8cf5a-2c30-9fd9-d10c-d12d1f4faa23
+	fromColumn: Fact_Sales.Payment_Method_Key
+	toColumn: Dim_Payment_Method.Payment_Method_Key
+
+relationship 9942ea3b-9ff3-8e44-63b4-4cb845e96e3f
+	fromColumn: Fact_Sales.Product_Key
+	toColumn: Dim_Product.Product_Key
+

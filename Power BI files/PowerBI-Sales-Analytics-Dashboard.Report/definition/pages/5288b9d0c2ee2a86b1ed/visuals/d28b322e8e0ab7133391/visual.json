@@ -1,0 +1,164 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "d28b322e8e0ab7133391",
+  "position": {
+    "x": 160,
+    "y": 792,
+    "z": 9000,
+    "height": 174,
+    "width": 1600,
+    "tabOrder": 9000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Sales"
+                    }
+                  },
+                  "Property": "Transaction ID"
+                }
+              },
+              "queryRef": "Fact_Sales.Transaction ID",
+              "nativeQueryRef": "Transaction ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Sales"
+                    }
+                  },
+                  "Property": "Quantity"
+                }
+              },
+              "queryRef": "Sum(Fact_Sales.Quantity)",
+              "nativeQueryRef": "Quantity"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Sales"
+                    }
+                  },
+                  "Property": "Price Per Unit Final"
+                }
+              },
+              "queryRef": "Sum(Fact_Sales.Price Per Unit Final)",
+              "nativeQueryRef": "Price Per Unit Final"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Product"
+                    }
+                  },
+                  "Property": "Item"
+                }
+              },
+              "queryRef": "Dim_Product.Item",
+              "nativeQueryRef": "Item"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Payment_Method"
+                    }
+                  },
+                  "Property": "Payment Method"
+                }
+              },
+              "queryRef": "Dim_Payment_Method.Payment Method",
+              "nativeQueryRef": "Payment Method"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Location"
+                    }
+                  },
+                  "Property": "Location"
+                }
+              },
+              "queryRef": "Dim_Location.Location",
+              "nativeQueryRef": "Location"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Date"
+                    }
+                  },
+                  "Property": "Date"
+                }
+              },
+              "queryRef": "Dim_Date.Date",
+              "nativeQueryRef": "Date"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Category"
+                    }
+                  },
+                  "Property": "Category"
+                }
+              },
+              "queryRef": "Dim_Category.Category",
+              "nativeQueryRef": "Category"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Sales"
+                    }
+                  },
+                  "Property": "Calculated Total"
+                }
+              },
+              "queryRef": "Sum(Fact_Sales.Calculated Total)",
+              "nativeQueryRef": "Calculated Total"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Customer"
+                    }
+                  },
+                  "Property": "Customer ID"
+                }
+              },
+              "queryRef": "Dim_Customer.Customer ID",
+              "nativeQueryRef": "Customer ID"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

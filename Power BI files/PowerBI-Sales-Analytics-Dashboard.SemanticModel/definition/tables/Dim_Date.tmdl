@@ -1,0 +1,82 @@
+table Dim_Date
+	lineageTag: 66ee4877-060b-41ee-b696-61a352fcee49
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 3a9dc39f-e3e9-44bd-9777-a8febae96d46
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 49bef4cc-5cdf-401d-9fbb-e6ddb5d94d4d
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: 42343fc5-481b-4369-8995-ecdf453f5bf9
+		summarizeBy: sum
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 02a54e29-9724-424e-818c-83acd4366fd7
+		summarizeBy: none
+		sourceColumn: Month Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: cd213a86-e137-4f1f-8ddc-10569a092dd4
+		summarizeBy: sum
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 7b0b71aa-d70c-45de-92da-77bdb220f847
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Date = m
+		mode: import
+		source =
+				let
+				    Source = retail_store_sales,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"Transaction Date"}),
+				    #"Inserted Year" = Table.AddColumn(#"Removed Other Columns", "Year", each Date.Year([Transaction Date]), Int64.Type),
+				    #"Renamed Columns" = Table.RenameColumns(#"Inserted Year",{{"Year", "Year"}, {"Transaction Date", "Date"}}),
+				    #"Inserted Month" = Table.AddColumn(#"Renamed Columns", "Month", each Date.Month([Date]), Int64.Type),
+				    #"Inserted Month Name" = Table.AddColumn(#"Inserted Month", "Month Name", each Date.MonthName([Date]), type text),
+				    #"Inserted Quarter" = Table.AddColumn(#"Inserted Month Name", "Quarter", each Date.QuarterOfYear([Date]), Int64.Type),
+				    #"Added Custom" = Table.AddColumn(#"Inserted Quarter", "Date_Key", each Date.Year([Date]) * 10000 + Date.Month([Date]) * 100 + Date.Day([Date])),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom",{{"Date_Key", Int64.Type}}),
+				    #"Removed Duplicates" = Table.Distinct(#"Changed Type", {"Date"}),
+				    #"Sorted Rows" = Table.Sort(#"Removed Duplicates",{{"Date", Order.Ascending}})
+				in
+				    #"Sorted Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

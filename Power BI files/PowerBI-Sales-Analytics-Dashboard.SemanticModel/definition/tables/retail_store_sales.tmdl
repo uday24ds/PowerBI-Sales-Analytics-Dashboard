@@ -1,0 +1,142 @@
+table retail_store_sales
+	lineageTag: 580157a7-9cd0-428a-b38e-9b0fd5fbf1ca
+
+	column 'Transaction ID'
+		dataType: string
+		lineageTag: 8b0a89af-54a0-4551-8953-5089d849be49
+		summarizeBy: none
+		sourceColumn: Transaction ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Customer ID'
+		dataType: string
+		lineageTag: abfe22c0-9371-4b36-b496-49bd762b172b
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 5b2b13ec-0234-4470-8622-61511893c4ca
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: bf8234ef-f5d7-4743-b05a-6f780f9fbf6e
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Payment Method'
+		dataType: string
+		lineageTag: 20807db4-36ad-4641-9d22-be4c3a619b89
+		summarizeBy: none
+		sourceColumn: Payment Method
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location
+		dataType: string
+		lineageTag: 655af38d-eb34-4af5-8d2a-ce9b83ee0ea1
+		summarizeBy: none
+		sourceColumn: Location
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Transaction Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2ce9edcc-d7f9-423a-ae76-78d562d9aaa4
+		summarizeBy: none
+		sourceColumn: Transaction Date
+
+		variation Variation
+			isDefault
+			relationship: 46cb5567-19b3-49be-912b-8ce36ddcee71
+			defaultHierarchy: LocalDateTable_2022d74c-c539-46a9-b51e-faf22e81395e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Price Per Unit Final'
+		dataType: string
+		lineageTag: 56bee07a-ddd6-4f25-a29d-7aa0bc0d678e
+		summarizeBy: none
+		sourceColumn: Price Per Unit Final
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Calculated Total'
+		dataType: string
+		lineageTag: 71f71842-b9a3-46a5-b97d-2bbbb849f7db
+		summarizeBy: none
+		sourceColumn: Calculated Total
+
+		annotation SummarizationSetBy = Automatic
+
+	column Item_Final
+		dataType: string
+		lineageTag: db50a53c-bef4-418b-baea-7718f5a1abe0
+		summarizeBy: none
+		sourceColumn: Item_Final
+
+		annotation SummarizationSetBy = Automatic
+
+	column Discount_Applied_Clean
+		dataType: string
+		lineageTag: 9e84ab87-1d69-4278-9378-256d0d706bf2
+		summarizeBy: none
+		sourceColumn: Discount_Applied_Clean
+
+		annotation SummarizationSetBy = Automatic
+
+	partition retail_store_sales = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\ASUS\Downloads\retail_store_sales.csv"), [Delimiter = ",", Columns = 11, Encoding = 65001]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"Transaction ID", type text}, {"Customer ID", type text}, {"Category", type text}, {"Item", type text}, {"Price Per Unit", type number}, {"Quantity", Int64.Type}, {"Total Spent", type number}, {"Payment Method", type text}, {"Location", type text}, {"Transaction Date", type date}, {"Discount Applied", type logical}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed column type", "Calculated_Price", each [Total Spent]/[Quantity]),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Added Custom",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Calculated_Price", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Reordered Columns",{"Calculated_Price"}),
+				    #"Added Custom1" = Table.AddColumn(#"Removed Columns", "Price Per Unit Clean", each if [Price Per Unit] = null
+				then [Total Spent] / [Quantity]
+				else [Price Per Unit]),
+				    #"Reordered Columns1" = Table.ReorderColumns(#"Added Custom1",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied"}),
+				    #"Added Custom2" = Table.AddColumn(#"Reordered Columns1", "Calculated Total", each [Price Per Unit Clean] * [Quantity]),
+				    #"Reordered Columns2" = Table.ReorderColumns(#"Added Custom2",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied", "Calculated Total"}),
+				    #"Added Custom3" = Table.AddColumn(#"Reordered Columns2", "Total Difference", each [Total Spent] - [Calculated Total]),
+				    #"Reordered Columns3" = Table.ReorderColumns(#"Added Custom3",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Total Difference", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Discount Applied", "Calculated Total"}),
+				    #"Reordered Columns4" = Table.ReorderColumns(#"Reordered Columns3",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Total Difference", "Discount Applied", "Price Per Unit Clean", "Quantity", "Total Spent", "Payment Method", "Location", "Transaction Date", "Calculated Total"}),
+				    #"Added Custom4" = Table.AddColumn(#"Reordered Columns4", "Total Check", each if [Total Spent] = [Calculated Total] then "Match"
+				else if [Total Spent] = null and [Calculated Total] = null then "Both Null"
+				else if [Total Spent] = null then "Total Spent Missing"
+				else if [Calculated Total] = null then "Calculated Total Missing"
+				else "Mismatch"),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom4",{"Total Check"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Columns1", each true),
+				    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows",{{"Price Per Unit Clean", "Price Per Unit Final"}}),
+				    #"Reordered Columns5" = Table.ReorderColumns(#"Renamed Columns",{"Transaction ID", "Customer ID", "Category", "Item", "Price Per Unit", "Total Difference", "Discount Applied", "Price Per Unit Final", "Quantity", "Calculated Total", "Total Spent", "Payment Method", "Location", "Transaction Date"}),
+				    #"Added Custom5" = Table.AddColumn(#"Reordered Columns5", "Item_Final", each if[Item] = "" then "Unknown"
+				else [Item]),
+				    #"Reordered Columns6" = Table.ReorderColumns(#"Added Custom5",{"Transaction ID", "Customer ID", "Category", "Item", "Item_Final", "Price Per Unit", "Total Difference", "Discount Applied", "Price Per Unit Final", "Quantity", "Calculated Total", "Total Spent", "Payment Method", "Location", "Transaction Date"}),
+				    #"Added Custom6" = Table.AddColumn(#"Reordered Columns6", "Discount_Applied_Clean", each if [Discount Applied] is null then "Unknown"
+				else [Discount Applied]),
+				    #"Reordered Columns7" = Table.ReorderColumns(#"Added Custom6",{"Transaction ID", "Customer ID", "Category", "Item", "Item_Final", "Price Per Unit", "Total Difference", "Discount_Applied_Clean", "Discount Applied", "Price Per Unit Final", "Quantity", "Calculated Total", "Total Spent", "Payment Method", "Location", "Transaction Date"}),
+				    #"Removed Columns2" = Table.RemoveColumns(#"Reordered Columns7",{"Item", "Price Per Unit", "Total Difference", "Discount Applied", "Total Spent"})
+				in
+				    #"Removed Columns2"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

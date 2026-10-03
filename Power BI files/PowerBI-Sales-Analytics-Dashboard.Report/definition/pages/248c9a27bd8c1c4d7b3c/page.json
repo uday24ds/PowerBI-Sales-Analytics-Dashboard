@@ -1,0 +1,13 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "248c9a27bd8c1c4d7b3c",
+  "displayName": "Sales Performance",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920,
+  "pageBinding": {
+    "name": "f89bdea80603676b50d6",
+    "type": "Default",
+    "parameters": []
+  }
+}

@@ -1,0 +1,39 @@
+table Dim_Payment_Method
+	lineageTag: e8ab4d92-0a42-4e84-a969-4dd40864d979
+
+	column 'Payment Method'
+		dataType: string
+		lineageTag: 6842aa33-78e9-4383-b2ea-5b116ead83e9
+		summarizeBy: none
+		sourceColumn: Payment Method
+
+		annotation SummarizationSetBy = Automatic
+
+	column Payment_Method_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 11eb65da-52fa-4a08-935e-a42643de39d2
+		summarizeBy: none
+		sourceColumn: Payment_Method_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Payment_Method = m
+		mode: import
+		source =
+				let
+				    Source = retail_store_sales,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"Payment Method"}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Removed Other Columns",{{"Payment Method", Text.Trim, type text}}),
+				    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Payment Method", Text.Clean, type text}}),
+				    #"Capitalized Each Word" = Table.TransformColumns(#"Cleaned Text",{{"Payment Method", Text.Proper, type text}}),
+				    #"Removed Duplicates" = Table.Distinct(#"Capitalized Each Word"),
+				    #"Added Index" = Table.AddIndexColumn(#"Removed Duplicates", "Index", 1, 1, Int64.Type),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Index",{{"Index", "Payment_Method_Key"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

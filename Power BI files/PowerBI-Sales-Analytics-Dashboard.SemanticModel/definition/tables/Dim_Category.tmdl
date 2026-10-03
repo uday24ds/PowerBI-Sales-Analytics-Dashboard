@@ -1,0 +1,40 @@
+table Dim_Category
+	lineageTag: fb59d2a3-f330-4a16-9e64-2f4c7868cd94
+
+	column Category
+		dataType: string
+		lineageTag: 1d7fe0a1-6e2b-4275-8997-98fc68bdd2cc
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: d197183a-5981-449b-870c-c6f6edb220c5
+		summarizeBy: none
+		sourceColumn: Category_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Category = m
+		mode: import
+		source =
+				let
+				    Source = retail_store_sales,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"Category"}),
+				    #"Sorted Rows" = Table.Sort(#"Removed Other Columns",{{"Category", Order.Ascending}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Sorted Rows",{{"Category", Text.Trim, type text}}),
+				    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Category", Text.Clean, type text}}),
+				    #"Capitalized Each Word" = Table.TransformColumns(#"Cleaned Text",{{"Category", Text.Proper, type text}}),
+				    #"Removed Duplicates" = Table.Distinct(#"Capitalized Each Word"),
+				    #"Added Index" = Table.AddIndexColumn(#"Removed Duplicates", "Index", 1, 1, Int64.Type),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Index",{{"Index", "Category_Key"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

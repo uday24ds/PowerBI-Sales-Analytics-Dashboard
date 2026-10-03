@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "17a1e8900d1dd4930ea2",
+  "position": {
+    "x": 1662,
+    "y": 110,
+    "z": 19000,
+    "height": 192,
+    "width": 198,
+    "tabOrder": 19000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Sales"
+                    }
+                  },
+                  "Property": "YoY Sales Growth %"
+                }
+              },
+              "queryRef": "Fact_Sales.YoY Sales Growth %",
+              "nativeQueryRef": "YoY Sales Growth %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

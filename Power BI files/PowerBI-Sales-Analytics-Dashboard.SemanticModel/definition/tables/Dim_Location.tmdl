@@ -1,0 +1,36 @@
+table Dim_Location
+	lineageTag: 6cb73c6a-9a3e-4341-ac5a-bbbf3e3434b2
+
+	column Location
+		dataType: string
+		lineageTag: b3c3c37c-ae94-49c7-a2b7-32a8400b81ee
+		summarizeBy: none
+		sourceColumn: Location
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 1fe8271c-e937-4e16-a5a4-1d1c9b4e5567
+		summarizeBy: none
+		sourceColumn: Location_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Location = m
+		mode: import
+		source =
+				let
+				    Source = retail_store_sales,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"Location"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Added Index" = Table.AddIndexColumn(#"Removed Duplicates", "Index", 1, 1, Int64.Type),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Index",{{"Index", "Location_Key"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
