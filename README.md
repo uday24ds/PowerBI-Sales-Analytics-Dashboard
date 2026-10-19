@@ -1,46 +1,23 @@
-\# Power BI Sales Analytics Dashboard
+# Power BI Sales Analytics Dashboard
 
-
-
-\## Project Overview
-
+## Project Overview
 An interactive sales analytics project built using Microsoft Power BI to explore business performance and present insights through dashboards.
 
+## Tools Used
+- Microsoft Power BI
+- Power Query
+- DAX (where applicable)
 
+## Project Structure
+- `Power BI files/` — Power BI report and model files
+- `Screenshots/` — Dashboard screenshots
+- `Documentation/` — Supporting project documentation
 
-\## Tools Used
+## Documentation Status
+Detailed documentation of data sources, data preparation, data modeling, measures, and findings is in progress.
 
-\- Microsoft Power BI
-
-\- Power Query
-
-\- DAX (where applicable)
-
-
-
-\## Project Structure
-
-\- Power BI files/ — Power BI report and model files
-
-\- Screenshots/ — Dashboard screenshots
-
-\- Documentation/ — Supporting project documentation
-
-
-
-\## Documentation Status
-
-Detailed documentation covering data sources, data preparation, data modeling, measures, and findings is in progress.
-
-
-
-\## How to View
-
+## How to View
 Open the Power BI report in Microsoft Power BI Desktop. Some features may depend on the availability of the original data sources.
 
-
-
-\## Author
-
+## Author
 Uday Rathod
-
